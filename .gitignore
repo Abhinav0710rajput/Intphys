@@ -1,0 +1,28 @@
+cat > .gitignore <<'EOF'
+# HPC / python junk
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+
+# logs
+*.out
+*.err
+*.log
+
+# artifacts / data
+*.pkl
+*.pt
+*.pth
+*.ckpt
+*.npy
+*.npz
+*.csv
+*.parquet
+*.mp4
+data/
+videos/
+runs/
+wandb/
+checkpoints/
+outputs/
+EOF
