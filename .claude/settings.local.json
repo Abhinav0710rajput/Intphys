@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(head:*)",
+      "Bash(echo no pdf libs found:*)",
+      "Bash(tail:*)",
+      "Bash(sbatch:*)"
+    ]
+  }
+}
