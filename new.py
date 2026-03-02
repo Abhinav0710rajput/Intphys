@@ -227,22 +227,10 @@ with open("video_names.pkl", "rb") as f:
 with open(f"per_token_losses_window_{window_size}_pred_{prediction}_fps_{t}.pkl", "rb") as f:
     losses = pickle.load(f)
 
-# ── colour / style per video category ──────────────────────────────────────
-# Each video name encodes its category:
-#   normal_*          → physically possible, no added noise
-#   weird_*           → physics violation, no added noise
-#   normal_*_noise    → physically possible + noise
-#   weird_*_noise     → physics violation + noise
-def video_style(name):
-    stem = name.replace(".mp4", "")
-    noisy  = stem.endswith("_noise")
-    weird  = "weird" in stem
-    color  = {(False, False): "#2166ac",   # normal          – solid blue
-              (False, True ): "#d73027",   # weird           – solid red
-              (True,  False): "#74add1",   # normal + noise  – light blue
-              (True,  True ): "#f46d43"}   # weird  + noise  – light red
-    ls     = "--" if noisy else "-"
-    return color[(noisy, weird)], ls
+# ── unique colour per video ─────────────────────────────────────────────────
+n_videos = len(names)
+cmap = plt.get_cmap("tab20") if n_videos <= 20 else plt.get_cmap("hsv")
+colors = [cmap(i / max(n_videos, 1)) for i in range(n_videos)]
 
 fig, (ax_curves, ax_bar) = plt.subplots(
     2, 1, figsize=(14, 10),
@@ -250,7 +238,7 @@ fig, (ax_curves, ax_bar) = plt.subplots(
 )
 
 video_means = []
-for i in range(len(names)):
+for i in range(n_videos):
     window_losses = losses[i]
 
     # Scalar surprisal per window: mean MSE across all target tokens
@@ -265,10 +253,9 @@ for i in range(len(names)):
     print(f"  Windows : {len(window_level_losses)}")
     print(f"  Mean loss: {mean_loss:.6f} ± {std_loss:.6f}")
 
-    color, ls = video_style(names[i])
     label = names[i].replace(".mp4", "").replace("_", " ")
     ax_curves.plot(window_level_losses, label=label,
-                   linewidth=1.8, color=color, linestyle=ls)
+                   linewidth=1.8, color=colors[i])
 
 ax_curves.set_title("Surprisal (prediction error) per sliding window — higher = more surprised")
 ax_curves.set_xlabel(f"Window index  (window size={window_size}, target={prediction} frames, fps={t})")
@@ -277,9 +264,8 @@ ax_curves.grid(True, alpha=0.4)
 ax_curves.legend(bbox_to_anchor=(1.02, 1), loc="upper left", fontsize=9)
 
 # ── bar chart: overall mean surprisal per video ──────────────────────────────
-bar_colors = [video_style(n)[0] for n in names]
-bar_labels  = [n.replace(".mp4", "").replace("_", "\n") for n in names]
-ax_bar.bar(range(len(names)), video_means, color=bar_colors, edgecolor="k", linewidth=0.6)
+bar_labels = [n.replace(".mp4", "").replace("_", "\n") for n in names]
+ax_bar.bar(range(n_videos), video_means, color=colors, edgecolor="k", linewidth=0.6)
 ax_bar.set_xticks(range(len(names)))
 ax_bar.set_xticklabels(bar_labels, fontsize=8)
 ax_bar.set_ylabel("Mean surprisal")

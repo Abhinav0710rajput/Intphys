@@ -17,6 +17,7 @@ __pycache__/
 *.npy
 *.npz
 *.csv
+*.sbatch
 *.parquet
 *.mp4
 data/
