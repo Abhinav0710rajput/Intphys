@@ -269,7 +269,7 @@ ax_bar.bar(range(n_videos), video_means, color=colors, edgecolor="k", linewidth=
 ax_bar.set_xticks(range(len(names)))
 ax_bar.set_xticklabels(bar_labels, fontsize=8)
 ax_bar.set_ylabel("Mean surprisal")
-ax_bar.set_title("Overall mean surprisal per video  (weird/noisy should be higher)")
+ax_bar.set_title("Overall mean surprisal per video  (weird/noisy/shuffled should be higher)")
 ax_bar.grid(axis="y", alpha=0.4)
 
 plt.tight_layout()
