@@ -23,7 +23,7 @@ source ~/.bashrc
 
 conda activate torchenv
 
-#python video_edit.py
+python video_edit.py
 
 python sweep.py
 
