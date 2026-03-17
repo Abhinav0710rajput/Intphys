@@ -32,7 +32,8 @@ model.eval()  # Set to evaluation mode
 
 # Video processing parameters
 window_size = 48
-prediction = 2
+context = 14
+prediction = window_size - context  # Number of frames to predict
 hw = 256
 video_path = "videos"
 target_fps = 6
@@ -106,17 +107,23 @@ for i, video in enumerate(videos):
             assert predictor_outputs.shape == encoder_target_output.shape, \
                 f"Shape mismatch: predictor {predictor_outputs.shape} vs encoder {encoder_target_output.shape}"
             
-            # Calculate L2 loss (MSE) - overall average
-            l2_loss = torch.nn.functional.mse_loss(
-                predictor_outputs.float(), 
+            # Layer-normalize targets only (as per IntPhys2 / V-JEPA2 paper)
+            encoder_target_normed = torch.nn.functional.layer_norm(
                 encoder_target_output.float(),
+                (encoder_target_output.shape[-1],)
+            )
+
+            # L1 loss (as per paper, not MSE)
+            l2_loss = torch.nn.functional.l1_loss(
+                predictor_outputs.float(),
+                encoder_target_normed,
                 reduction='mean'
             )
-            
-            # Calculate per-token L2 loss for detailed analysis
+
+            # Per-token L1 loss for detailed analysis
             # Shape: [batch_size (=1), num_tokens]
             per_token_loss = torch.mean(
-                (predictor_outputs.float() - encoder_target_output.float()) ** 2, 
+                torch.abs(predictor_outputs.float() - encoder_target_normed),
                 dim=-1  # Average over embedding dimension
             )
             

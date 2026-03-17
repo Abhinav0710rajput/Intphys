@@ -33,8 +33,11 @@ def process_video(video_path, target_fps=6, window_size=30, prediction=20, resiz
         cap = cv2.VideoCapture(vid_path)
         original_fps = cap.get(cv2.CAP_PROP_FPS)
         
-        # Calculate frame skip for target fps
-        frame_skip = int(original_fps / target_fps) if original_fps > target_fps else 1
+        # Calculate frame skip for target fps (None = keep original fps)
+        if target_fps is None:
+            frame_skip = 1
+        else:
+            frame_skip = int(original_fps / target_fps) if original_fps > target_fps else 1
         
         # Read and process all frames
         frames = []

@@ -4,7 +4,7 @@
 #SBATCH --gres=gpu:1
 #SBATCH --cpus-per-task=4
 #SBATCH --mem=16G
-#SBATCH --time=04:00:00
+#SBATCH --time=08:00:00
 #SBATCH --requeue
 #SBATCH -o slurm-%j.out
 #SBATCH -e slurm-%j.err
@@ -23,8 +23,8 @@ source ~/.bashrc
 
 conda activate torchenv
 
-# python video_edit.py
+#python video_edit.py
 
-python new.py
+python sweep.py
 
 echo "Job finished"
